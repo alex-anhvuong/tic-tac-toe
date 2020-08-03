@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tic_tac_toe/constants.dart';
+import 'package:tic_tac_toe/screens/game_screen.dart';
 
 class ElevatedButton extends StatelessWidget {
   const ElevatedButton({
@@ -20,7 +21,14 @@ class ElevatedButton extends StatelessWidget {
         'Enter',
         style: kSmallTextStyle,
       ),
-      onPressed: () {},
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => GameScreen(),
+          ),
+        );
+      },
     );
   }
 }

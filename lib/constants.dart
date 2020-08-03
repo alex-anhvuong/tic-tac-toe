@@ -17,3 +17,5 @@ const kSmallTextStyle = TextStyle(
   fontSize: 15.0,
   fontWeight: FontWeight.w500,
 );
+
+const kAppBackgroundColor = Color(0xff315064);
