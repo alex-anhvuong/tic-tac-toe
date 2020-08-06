@@ -1,23 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:tic_tac_toe/constants.dart';
-import 'package:tic_tac_toe/models/checker_brain_data.dart';
 
 class CheckerSquare extends StatelessWidget {
   final int id;
   final String squareItem;
+  final Function onPressed;
 
-  CheckerSquare({this.id, this.squareItem});
+  CheckerSquare({this.id, this.squareItem, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        if (squareItem == "") {
-          Provider.of<CheckerBrainData>(context, listen: false)
-              .updateSquareState(id);
-        }
-      },
+      onTap: onPressed,
       child: Container(
         color: kAppBackgroundColor,
         child: getSquareIcon(),
