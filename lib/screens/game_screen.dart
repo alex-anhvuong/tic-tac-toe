@@ -40,8 +40,8 @@ class _GameScreenState extends State<GameScreen> {
               ),
               Container(
                 color: Colors.grey[600],
-                child: StreamBuilder<DocumentSnapshot>(
-                  stream: checkerBrain.stateStream,
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: checkerBrain.stateStream.snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       return Text('Something went wrong');
@@ -51,7 +51,14 @@ class _GameScreenState extends State<GameScreen> {
                       return Text("Loading");
                     }
 
-                    checkerBrain.setGameState(snapshot.data);
+                    if (!snapshot.hasData) {
+                      return Text("Loading data");
+                    }
+
+                    List<DocumentSnapshot> gameStates = snapshot.data.documents;
+
+                    checkerBrain.setGameState(
+                        gameStates.length > 0 ? gameStates.last : null);
 
                     return GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
