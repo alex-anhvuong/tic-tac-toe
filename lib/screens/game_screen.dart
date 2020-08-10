@@ -1,93 +1,72 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:tic_tac_toe/components/checker_square.dart';
+import 'package:provider/provider.dart';
+import 'package:tic_tac_toe/components/checker_board.dart';
 import 'package:tic_tac_toe/constants.dart';
-import 'package:tic_tac_toe/models/checker_brain.dart';
+import 'package:tic_tac_toe/models/checker_brain_provider.dart';
 
-class GameScreen extends StatefulWidget {
-  @override
-  _GameScreenState createState() => _GameScreenState();
-}
+import 'package:timer_count_down/timer_count_down.dart';
 
-class _GameScreenState extends State<GameScreen> {
-  CheckerBrain checkerBrain = CheckerBrain();
-
+class GameScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kAppBackgroundColor,
-      body: SafeArea(
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(
-            vertical: 0,
-            horizontal: 20.0,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Column(
+    return Consumer<CheckerBrainProvider>(
+      builder: (_, cbProvider, __) {
+        return Scaffold(
+          backgroundColor: kAppBackgroundColor,
+          body: SafeArea(
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(
+                vertical: 0,
+                horizontal: 20.0,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  Text(
-                    '1:32',
-                    style: kHeadingTextStyle,
+                  Column(
+                    children: <Widget>[
+                      Countdown(
+                        controller: cbProvider.cdController,
+                        seconds: 90,
+                        build: (_, double time) => Text(
+                          '${(time / 60).floor().toStringAsFixed(0)} ${time / 60 > 0 ? ':' : ''} ${(time % 60 < 10) ? 0 : ''}${(time % 60).toStringAsFixed(0)}',
+                          style: kHeadingTextStyle,
+                        ),
+                        onFinished: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      Text(
+                        'It\'s ${cbProvider.userName} move',
+                        style: kNormalTextStyle,
+                      ),
+                    ],
                   ),
-                  Text(
-                    'It\'s your move',
-                    style: kNormalTextStyle,
+                  CheckerBoard(),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text('quit', style: kSmallTextStyle),
                   ),
                 ],
               ),
-              Container(
-                color: Colors.grey[600],
-                child: StreamBuilder<QuerySnapshot>(
-                  stream: checkerBrain.stateStream.snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Text('Something went wrong');
-                    }
-
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Text("Loading");
-                    }
-
-                    if (!snapshot.hasData) {
-                      return Text("Loading data");
-                    }
-
-                    List<DocumentSnapshot> gameStates = snapshot.data.documents;
-
-                    checkerBrain.setGameState(
-                        gameStates.length > 0 ? gameStates.last : null);
-
-                    return GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 2,
-                        mainAxisSpacing: 2,
-                      ),
-                      itemCount: 9,
-                      itemBuilder: (context, index) {
-                        return CheckerSquare(
-                          id: index,
-                          squareItem: checkerBrain.squareStateList[index],
-                          onPressed: () {
-                            if (checkerBrain.squareStateList[index] == "") {
-                              checkerBrain.updateSquareState(index);
-                            }
-                          },
-                        );
-                      },
-                      shrinkWrap: true,
-                    );
-                  },
-                ),
-              ),
-              Text('quit', style: kSmallTextStyle),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
+
+  // Widget getCheckerBoard() {
+  //   print(checkerBrain.gameStatus);
+  //   switch (checkerBrain.gameStatus) {
+  //     case GameStatus.won:
+  //       return Text("Win!");
+  //     case GameStatus.lost:
+  //       return Text("Lost!");
+  //     default:
+  //       return CheckerBoard(checkerBrain: checkerBrain);
+  //   }
+  // }
 }

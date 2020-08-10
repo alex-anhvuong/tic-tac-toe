@@ -19,3 +19,9 @@ const kSmallTextStyle = TextStyle(
 );
 
 const kAppBackgroundColor = Color(0xff315064);
+
+// enum GameStatus {
+//   playing,
+//   won,
+//   lost,
+// }

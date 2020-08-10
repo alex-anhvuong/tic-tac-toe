@@ -1,27 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CheckerBrain {
-  int _currentMove;
-  List<String> _squareStateList;
-  var stateStream;
-
-  int get currentMove => _currentMove;
-  List<String> get squareStateList => _squareStateList;
+  int currentMove;
+  List<String> squareStateList;
+  // GameStatus gameStatus;
+  Query stateStream;
 
   CheckerBrain() {
     stateStream =
         Firestore.instance.collection('game-states').orderBy('lastUploaded');
+    // gameStatus = GameStatus.playing;
   }
 
   void updateSquareState(int id) {
-    if (_currentMove % 2 == 0)
-      _squareStateList[id] = "x";
+    if (currentMove % 2 == 0)
+      squareStateList[id] = "x";
     else
-      _squareStateList[id] = "o";
+      squareStateList[id] = "o";
 
-    _currentMove++;
+    currentMove++;
 
     if (checkGameWin()) {
+      // gameStatus = GameStatus.won;
       createNewGame();
       deleteGameStates();
     }
@@ -41,22 +41,22 @@ class CheckerBrain {
   }
 
   void createNewGame() {
-    _currentMove = 0;
-    _squareStateList = List.generate(9, (index) => "");
+    currentMove = 0;
+    squareStateList = List.generate(9, (index) => "");
   }
 
   void pushGameState() async {
     await Firestore.instance.collection('game-states').add({
-      'move': _currentMove,
-      'squareStates': _squareStateList,
+      'move': currentMove,
+      'squareStates': squareStateList,
       'lastUploaded': FieldValue.serverTimestamp(),
     });
   }
 
   void setGameState(DocumentSnapshot stateSnapshot) {
     if (stateSnapshot != null) {
-      _currentMove = stateSnapshot['move'];
-      _squareStateList = List.from(stateSnapshot['squareStates']);
+      currentMove = stateSnapshot['move'];
+      squareStateList = List.from(stateSnapshot['squareStates']);
     } else {
       createNewGame();
       pushGameState();
@@ -65,26 +65,26 @@ class CheckerBrain {
 
   bool checkGameWin() {
     for (int i = 0; i <= 2; i++) {
-      if (_squareStateList[i] != '' &&
-          _squareStateList[i] == _squareStateList[i + 3] &&
-          _squareStateList[i] == _squareStateList[i + 6]) return true;
+      if (squareStateList[i] != '' &&
+          squareStateList[i] == squareStateList[i + 3] &&
+          squareStateList[i] == squareStateList[i + 6]) return true;
     }
 
     for (int i = 0; i <= 6; i += 3) {
-      if (_squareStateList[i] != '' &&
-          _squareStateList[i] == _squareStateList[i + 1] &&
-          _squareStateList[i] == _squareStateList[i + 2]) return true;
+      if (squareStateList[i] != '' &&
+          squareStateList[i] == squareStateList[i + 1] &&
+          squareStateList[i] == squareStateList[i + 2]) return true;
     }
 
-    if (_squareStateList[0] != '' &&
-        _squareStateList[0] == _squareStateList[4] &&
-        _squareStateList[0] == _squareStateList[8]) return true;
+    if (squareStateList[0] != '' &&
+        squareStateList[0] == squareStateList[4] &&
+        squareStateList[0] == squareStateList[8]) return true;
 
-    if (_squareStateList[2] != '' &&
-        _squareStateList[2] == _squareStateList[4] &&
-        _squareStateList[2] == _squareStateList[6]) return true;
+    if (squareStateList[2] != '' &&
+        squareStateList[2] == squareStateList[4] &&
+        squareStateList[2] == squareStateList[6]) return true;
 
-    if (_currentMove == 9) return true;
+    if (currentMove == 9) return true;
     return false;
   }
 }
