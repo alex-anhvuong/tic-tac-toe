@@ -18,6 +18,8 @@ const kSmallTextStyle = TextStyle(
   fontWeight: FontWeight.w500,
 );
 
+const kTimeLimit = 180;
+
 const kAppBackgroundColor = Color(0xff315064);
 
 // enum GameStatus {

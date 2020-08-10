@@ -27,7 +27,7 @@ class GameScreen extends StatelessWidget {
                     children: <Widget>[
                       Countdown(
                         controller: cbProvider.cdController,
-                        seconds: 90,
+                        seconds: kTimeLimit,
                         build: (_, double time) => Text(
                           '${(time / 60).floor().toStringAsFixed(0)} ${time / 60 > 0 ? ':' : ''} ${(time % 60 < 10) ? 0 : ''}${(time % 60).toStringAsFixed(0)}',
                           style: kHeadingTextStyle,
@@ -37,7 +37,7 @@ class GameScreen extends StatelessWidget {
                         },
                       ),
                       Text(
-                        'It\'s ${cbProvider.userName} move',
+                        'It\'s ${cbProvider.userName()} move',
                         style: kNormalTextStyle,
                       ),
                     ],

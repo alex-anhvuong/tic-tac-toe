@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class CheckerBrain {
   int currentMove;
   List<String> squareStateList;
+  String winner, userName = 'Guest';
   // GameStatus gameStatus;
   Query stateStream;
 
@@ -21,9 +22,9 @@ class CheckerBrain {
     currentMove++;
 
     if (checkGameWin()) {
-      // gameStatus = GameStatus.won;
-      createNewGame();
-      deleteGameStates();
+      winner = userName;
+      // createNewGame();
+      // deleteGameStates();
     }
 
     pushGameState();
@@ -43,23 +44,30 @@ class CheckerBrain {
   void createNewGame() {
     currentMove = 0;
     squareStateList = List.generate(9, (index) => "");
+    winner = '';
   }
 
   void pushGameState() async {
     await Firestore.instance.collection('game-states').add({
       'move': currentMove,
       'squareStates': squareStateList,
+      'winner': winner,
       'lastUploaded': FieldValue.serverTimestamp(),
     });
   }
 
   void setGameState(DocumentSnapshot stateSnapshot) {
-    if (stateSnapshot != null) {
-      currentMove = stateSnapshot['move'];
-      squareStateList = List.from(stateSnapshot['squareStates']);
-    } else {
+    if (stateSnapshot == null) {
       createNewGame();
       pushGameState();
+      return;
+    }
+
+    currentMove = stateSnapshot['move'];
+    squareStateList = List.from(stateSnapshot['squareStates']);
+    winner = stateSnapshot['winner'];
+    if (winner != '' && winner == userName) {
+      print(winner);
     }
   }
 
