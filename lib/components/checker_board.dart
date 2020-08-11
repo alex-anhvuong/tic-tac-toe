@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tic_tac_toe/components/checker_square.dart';
+import 'package:tic_tac_toe/components/elevated_button.dart';
+import 'package:tic_tac_toe/constants.dart';
 import 'package:tic_tac_toe/models/checker_brain_provider.dart';
 
 class CheckerBoard extends StatelessWidget {
@@ -9,29 +11,53 @@ class CheckerBoard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<CheckerBrainProvider>(
       builder: (_, cbProvider, __) {
-        return Container(
-          color: Colors.grey[600],
-          child: StreamBuilder<QuerySnapshot>(
-            stream: cbProvider.getCBStream(),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return Text('Something went wrong');
-              }
+        return StreamBuilder<QuerySnapshot>(
+          stream: cbProvider.getCBStream(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Text('Something went wrong');
+            }
 
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Text("Loading");
-              }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Text("Loading");
+            }
 
-              if (!snapshot.hasData) {
-                return Text("Loading data");
-              }
+            if (!snapshot.hasData) {
+              // TODO: Add a Loader Indicator here
+              return Text("Loading data");
+            }
 
-              List<DocumentSnapshot> gameStates = snapshot.data.documents;
+            List<DocumentSnapshot> gameStates = snapshot.data.documents;
 
-              cbProvider
-                  .setGameState(gameStates.length > 0 ? gameStates.last : null);
+            cbProvider
+                .setGameState(gameStates.length > 0 ? gameStates.last : null);
 
-              return GridView.builder(
+            cbProvider.setGameStatus();
+
+            if (cbProvider.gameStatus != GameStatus.playing) {
+              cbProvider.cdController.onPause();
+
+              return Column(
+                children: [
+                  getResultText(cbProvider.gameStatus),
+                  SizedBox(
+                    height: 30.0,
+                  ),
+                  ElevatedButton(
+                    text: 'Play again?',
+                    onPressed: () {
+                      cbProvider.gameStatus = GameStatus.playing;
+                      cbProvider.resetGameStates();
+                      cbProvider.cdController.onResume();
+                    },
+                  ),
+                ],
+              );
+            }
+
+            return Container(
+              color: Colors.grey[600],
+              child: GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   crossAxisSpacing: 2,
@@ -50,11 +76,31 @@ class CheckerBoard extends StatelessWidget {
                   );
                 },
                 shrinkWrap: true,
-              );
-            },
-          ),
+              ),
+            );
+          },
         );
       },
+    );
+  }
+
+  Text getResultText(GameStatus result) {
+    String text;
+    switch (result) {
+      case GameStatus.won:
+        text = 'You won!';
+        break;
+      case GameStatus.lost:
+        text = 'Sorry. Defeat :(';
+        break;
+      default:
+        text = 'It\'s a draw!';
+        break;
+    }
+
+    return Text(
+      text,
+      style: kHeadingTextStyle,
     );
   }
 }

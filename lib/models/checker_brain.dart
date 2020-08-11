@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:tic_tac_toe/constants.dart';
 
 class CheckerBrain {
   int currentMove;
@@ -21,10 +22,8 @@ class CheckerBrain {
 
     currentMove++;
 
-    if (checkGameWin()) {
+    if (checkGameResult() == GameStatus.won) {
       winner = userName;
-      // createNewGame();
-      // deleteGameStates();
     }
 
     pushGameState();
@@ -66,33 +65,30 @@ class CheckerBrain {
     currentMove = stateSnapshot['move'];
     squareStateList = List.from(stateSnapshot['squareStates']);
     winner = stateSnapshot['winner'];
-    if (winner != '' && winner == userName) {
-      print(winner);
-    }
   }
 
-  bool checkGameWin() {
+  GameStatus checkGameResult() {
     for (int i = 0; i <= 2; i++) {
       if (squareStateList[i] != '' &&
           squareStateList[i] == squareStateList[i + 3] &&
-          squareStateList[i] == squareStateList[i + 6]) return true;
+          squareStateList[i] == squareStateList[i + 6]) return GameStatus.won;
     }
 
     for (int i = 0; i <= 6; i += 3) {
       if (squareStateList[i] != '' &&
           squareStateList[i] == squareStateList[i + 1] &&
-          squareStateList[i] == squareStateList[i + 2]) return true;
+          squareStateList[i] == squareStateList[i + 2]) return GameStatus.won;
     }
 
     if (squareStateList[0] != '' &&
         squareStateList[0] == squareStateList[4] &&
-        squareStateList[0] == squareStateList[8]) return true;
+        squareStateList[0] == squareStateList[8]) return GameStatus.won;
 
     if (squareStateList[2] != '' &&
         squareStateList[2] == squareStateList[4] &&
-        squareStateList[2] == squareStateList[6]) return true;
+        squareStateList[2] == squareStateList[6]) return GameStatus.won;
 
-    if (currentMove == 9) return true;
-    return false;
+    if (currentMove == 9) return GameStatus.drawn;
+    return GameStatus.playing;
   }
 }

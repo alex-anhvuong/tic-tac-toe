@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:tic_tac_toe/constants.dart';
-import 'package:tic_tac_toe/screens/game_screen.dart';
 
 class ElevatedButton extends StatelessWidget {
-  const ElevatedButton({
-    Key key,
-  }) : super(key: key);
+  final Function onPressed;
+  final String text;
+
+  ElevatedButton({@required this.onPressed, @required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -18,17 +18,10 @@ class ElevatedButton extends StatelessWidget {
         ),
       ),
       child: Text(
-        'Enter',
+        text,
         style: kSmallTextStyle,
       ),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => GameScreen(),
-          ),
-        );
-      },
+      onPressed: onPressed,
     );
   }
 }

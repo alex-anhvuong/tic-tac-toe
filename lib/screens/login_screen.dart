@@ -4,6 +4,8 @@ import 'package:tic_tac_toe/constants.dart';
 import 'package:tic_tac_toe/components/elevated_button.dart';
 import 'package:tic_tac_toe/models/checker_brain_provider.dart';
 
+import 'game_screen.dart';
+
 class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -70,7 +72,17 @@ class LoginScreen extends StatelessWidget {
                             fillColor: Color(0xff47687d),
                           ),
                         ),
-                        ElevatedButton(),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => GameScreen(),
+                              ),
+                            );
+                          },
+                          text: 'Enter',
+                        ),
                       ],
                     ),
                   ),

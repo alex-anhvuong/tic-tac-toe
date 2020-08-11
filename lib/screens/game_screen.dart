@@ -29,7 +29,8 @@ class GameScreen extends StatelessWidget {
                         controller: cbProvider.cdController,
                         seconds: kTimeLimit,
                         build: (_, double time) => Text(
-                          '${(time / 60).floor().toStringAsFixed(0)} ${time / 60 > 0 ? ':' : ''} ${(time % 60 < 10) ? 0 : ''}${(time % 60).toStringAsFixed(0)}',
+                          // '${(time / 60).floor().toStringAsFixed(0)} ${time / 60 > 0 ? ':' : ''} ${(time % 60 < 10) ? 0 : ''}${(time % 60).toStringAsFixed(0)}',
+                          time.toStringAsFixed(0),
                           style: kHeadingTextStyle,
                         ),
                         onFinished: () {
@@ -37,7 +38,7 @@ class GameScreen extends StatelessWidget {
                         },
                       ),
                       Text(
-                        'It\'s ${cbProvider.userName()} move',
+                        'It\'s ${cbProvider.userName()}\'s move',
                         style: kNormalTextStyle,
                       ),
                     ],
@@ -57,16 +58,4 @@ class GameScreen extends StatelessWidget {
       },
     );
   }
-
-  // Widget getCheckerBoard() {
-  //   print(checkerBrain.gameStatus);
-  //   switch (checkerBrain.gameStatus) {
-  //     case GameStatus.won:
-  //       return Text("Win!");
-  //     case GameStatus.lost:
-  //       return Text("Lost!");
-  //     default:
-  //       return CheckerBoard(checkerBrain: checkerBrain);
-  //   }
-  // }
 }
